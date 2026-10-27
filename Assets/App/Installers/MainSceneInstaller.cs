@@ -11,6 +11,7 @@ namespace App.Installers
         [SerializeField] private Transform _root = null!;
         [SerializeField] private PrefabStorage _prefabStorage = null!;
         [SerializeField] private ColorStorage _colorStorage = null!;
+        [SerializeField] private NameStorage _nameStorage = null!;
 
         public override void InstallBindings()
         {
@@ -19,10 +20,12 @@ namespace App.Installers
                 .To<Spawner<Animal>>()
                 .AsSingle();
 
+            Container.BindInterfacesTo<MoveService>().AsSingle();
+
             Container
                 .BindInterfacesTo<BootService>()
                 .AsSingle()
-                .WithArguments(_prefabStorage, _colorStorage, _root);
+                .WithArguments(_prefabStorage, _colorStorage, _nameStorage, _root);
         }
     }
 }
