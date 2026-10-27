@@ -1,28 +1,35 @@
-using System.Collections.Generic;
+using System;
 using App.Domains.Entity.Api;
 using App.Domains.Entity.Impl;
 using App.Domains.Resource.Api;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace App
 {
-    public class BootService : IInitializable
+    public class BootService : IInitializable, IDisposable
     {
-        private readonly IFactory<GameObject, Transform, ISpawner> _spawnerFactory;
+        private const float SpawnPeriod = 2f;
+
+        private readonly IFactory<Animal, Transform, ISpawner<Animal>> _spawnerFactory;
         private readonly IPrefabStorage _prefabStorage;
+        private readonly IColorStorage _colorStorage;
         private readonly Transform _root;
 
+        private ISpawner<Animal>? _animalSpawner;
         private Level? _level;
-        private ISpawner[] _spawners = new ISpawner[1];
 
         public BootService(
-            IFactory<GameObject, Transform, ISpawner> spawnerFactory,
+            IFactory<Animal, Transform, ISpawner<Animal>> spawnerFactory,
             IPrefabStorage prefabStorage,
+            IColorStorage colorStorage,
             Transform root)
         {
             _spawnerFactory = spawnerFactory;
             _prefabStorage = prefabStorage;
+            _colorStorage = colorStorage;
             _root = root;
         }
 
@@ -30,16 +37,15 @@ namespace App
         {
             CreateLevel();
             CreateAnimalSpawner();
-
-            float spawnPeriod = 2f;
-            _spawners[0].Start(spawnPeriod);
         }
 
         private void CreateAnimalSpawner()
         {
             if (_prefabStorage.TryGet(out Animal? animal))
             {
-                _spawners[0] = _spawnerFactory.Create(animal!.gameObject, _root);
+                _animalSpawner = _spawnerFactory.Create(animal!, _root);
+                _animalSpawner.Start(SpawnPeriod);
+                _animalSpawner.Spawned += OnAnimalSpawned;
             }
             else
             {
@@ -56,6 +62,20 @@ namespace App
             else
             {
                 Debug.LogError($"{nameof(BootService)}: Level not found");
+            }
+        }
+
+        private void OnAnimalSpawned(Animal animal) =>
+            animal.SetColor(Random.value < 0.5f
+                ? _colorStorage.PredatorColor
+                : _colorStorage.PreyColor);
+
+        public void Dispose()
+        {
+            if (_animalSpawner != null)
+            {
+                _animalSpawner.Stop();
+                _animalSpawner.Spawned -= OnAnimalSpawned;
             }
         }
     }

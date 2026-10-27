@@ -6,15 +6,17 @@ using Object = UnityEngine.Object;
 
 namespace App.Domains.Entity.Impl
 {
-    public class Spawner : ISpawner
+    public class Spawner<T> : ISpawner<T> where T : Component
     {
-        private readonly GameObject _prefab;
+        private readonly T _prefab;
         private readonly Transform _spawnPoint;
         private readonly ITimerService _timerService;
 
         private IDisposable? _handle;
 
-        public Spawner(GameObject prefab, Transform spawnPoint, ITimerService timerService)
+        public event Action<T> Spawned = delegate { };
+
+        public Spawner(T prefab, Transform spawnPoint, ITimerService timerService)
         {
             _prefab = prefab;
             _spawnPoint = spawnPoint;
@@ -22,9 +24,15 @@ namespace App.Domains.Entity.Impl
         }
 
         public void Start(float period) =>
-            _handle = _timerService.AddLooped(() => Object.Instantiate(_prefab, _spawnPoint), period);
+            _handle = _timerService.AddLooped(Spawn, period);
 
         public void Stop() =>
             _handle?.Dispose();
+
+        private void Spawn()
+        {
+            T obj = Object.Instantiate(_prefab, _spawnPoint);
+            Spawned.Invoke(obj);
+        }
     }
 }

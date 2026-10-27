@@ -11,6 +11,6 @@ namespace App.Domains.Entity.Impl
         public NavMeshAgent Agent => _agent;
 
         public void SetColor(Color color) =>
-            _renderer.sharedMaterial.color = color;
+            _renderer.material.color = color;
     }
 }

@@ -1,4 +1,3 @@
-using System.Runtime.Remoting;
 using App.Domains.Entity.Api;
 using App.Domains.Entity.Impl;
 using App.Domains.Resource.Impl;
@@ -11,18 +10,19 @@ namespace App.Installers
     {
         [SerializeField] private Transform _root = null!;
         [SerializeField] private PrefabStorage _prefabStorage = null!;
+        [SerializeField] private ColorStorage _colorStorage = null!;
 
         public override void InstallBindings()
         {
             Container
-                .BindIFactory<GameObject, Transform, ISpawner>()
-                .To<Spawner>()
+                .BindIFactory<Animal, Transform, ISpawner<Animal>>()
+                .To<Spawner<Animal>>()
                 .AsSingle();
 
             Container
                 .BindInterfacesTo<BootService>()
                 .AsSingle()
-                .WithArguments(_prefabStorage, _root);
+                .WithArguments(_prefabStorage, _colorStorage, _root);
         }
     }
 }

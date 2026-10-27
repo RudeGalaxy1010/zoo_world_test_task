@@ -277,6 +277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _root: {fileID: 1197129070}
   _prefabStorage: {fileID: 11400000, guid: d8b1d935e64d4f647b379dfea04c5aca, type: 2}
+  _colorStorage: {fileID: 11400000, guid: 0a9c699862d877a4395c6144ad56226e, type: 2}
 --- !u!1 &1817684510
 GameObject:
   m_ObjectHideFlags: 0
