@@ -1,3 +1,6 @@
+using System.Runtime.Remoting;
+using App.Domains.Entity.Api;
+using App.Domains.Entity.Impl;
 using App.Domains.Resource.Impl;
 using UnityEngine;
 using Zenject;
@@ -11,6 +14,11 @@ namespace App.Installers
 
         public override void InstallBindings()
         {
+            Container
+                .BindIFactory<GameObject, Transform, ISpawner>()
+                .To<Spawner>()
+                .AsSingle();
+
             Container
                 .BindInterfacesTo<BootService>()
                 .AsSingle()
