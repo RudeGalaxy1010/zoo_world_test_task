@@ -1,10 +1,8 @@
-using UnityEngine;
 using Zenject;
 
 namespace App.Installers
 {
-    [CreateAssetMenu(fileName = "MainSceneInstaller", menuName = "Installers/MainSceneInstaller")]
-    public class MainSceneInstaller : ScriptableObjectInstaller<MainSceneInstaller>
+    public class MainSceneInstaller : MonoInstaller<MainSceneInstaller>
     {
         public override void InstallBindings() { }
     }
