@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: _movementStrategy
       value: 
       objectReference: {fileID: 76275384668024336}
+    - target: {fileID: 6820279722687303056, guid: c0d0f470c92baec49ac9d7c7b713a6c8, type: 3}
+      propertyPath: _predationPriority
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

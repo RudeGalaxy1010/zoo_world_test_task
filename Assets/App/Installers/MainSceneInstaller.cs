@@ -22,6 +22,7 @@ namespace App.Installers
                 .AsSingle();
 
             Container.BindInterfacesTo<MoveService>().AsSingle();
+            Container.Bind<AnimalCollisionService>().AsSingle();
 
             Container
                 .BindInterfacesTo<BootService>()

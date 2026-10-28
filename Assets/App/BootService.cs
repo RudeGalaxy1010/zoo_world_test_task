@@ -16,6 +16,7 @@ namespace App
 
         private readonly IFactory<Func<Animal>, ISpawner<Animal>> _spawnerFactory;
         private readonly IMoveService _moveService;
+        private readonly AnimalCollisionService _collisionService;
         private readonly IPrefabStorage _prefabStorage;
         private readonly IColorStorage _colorStorage;
         private readonly INameStorage _nameStorage;
@@ -27,6 +28,7 @@ namespace App
         public BootService(
             IFactory<Func<Animal>, ISpawner<Animal>> spawnerFactory,
             IMoveService moveService,
+            AnimalCollisionService collisionService,
             IPrefabStorage prefabStorage,
             IColorStorage colorStorage,
             INameStorage nameStorage,
@@ -34,6 +36,7 @@ namespace App
         {
             _spawnerFactory = spawnerFactory;
             _moveService = moveService;
+            _collisionService = collisionService;
             _prefabStorage = prefabStorage;
             _colorStorage = colorStorage;
             _nameStorage = nameStorage;
@@ -79,8 +82,19 @@ namespace App
             return animal;
         }
 
-        private void OnAnimalSpawned(Animal animal) =>
+        private void OnAnimalSpawned(Animal animal)
+        {
+            animal.Collided += _collisionService.Resolve;
+            animal.Removed += OnAnimalRemoved;
             _moveService.Register(animal);
+        }
+
+        private void OnAnimalRemoved(Animal animal)
+        {
+            animal.Collided -= _collisionService.Resolve;
+            animal.Removed -= OnAnimalRemoved;
+            _moveService.Unregister(animal);
+        }
 
         private void SetupPrey(Animal animal)
         {
