@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 344f799a4f614e46a8cfbec5679d6d64, type: 3}
   m_Name: PrefabStorage
   m_EditorClassIdentifier: 
-  _prefabs:
-  - {fileID: 8557140797410611453, guid: 2cd3cefa2fb95de4f9d13b15f4c74e22, type: 3}
-  - {fileID: 6480564429781972662, guid: c0d0f470c92baec49ac9d7c7b713a6c8, type: 3}
+  _level: {fileID: -6498864752693196815, guid: 2cd3cefa2fb95de4f9d13b15f4c74e22, type: 3}
+  _frog: {fileID: 5618503935894170025, guid: a80309a182ff4054f934482e51a1755c, type: 3}
+  _snake: {fileID: 1236023762847551416, guid: 4f926771c5d52494d8fd253f563bea53, type: 3}

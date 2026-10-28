@@ -2,24 +2,21 @@ using System;
 using App.Domains.Core.Api;
 using App.Domains.Entity.Api;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace App.Domains.Entity.Impl
 {
     public class Spawner<T> : ISpawner<T> where T : Component
     {
-        private readonly T _prefab;
-        private readonly Transform _spawnPoint;
+        private readonly Func<T> _create;
         private readonly ITimerService _timerService;
 
         private IDisposable? _handle;
 
         public event Action<T> Spawned = delegate { };
 
-        public Spawner(T prefab, Transform spawnPoint, ITimerService timerService)
+        public Spawner(Func<T> create, ITimerService timerService)
         {
-            _prefab = prefab;
-            _spawnPoint = spawnPoint;
+            _create = create;
             _timerService = timerService;
         }
 
@@ -31,7 +28,7 @@ namespace App.Domains.Entity.Impl
 
         private void Spawn()
         {
-            T obj = Object.Instantiate(_prefab, _spawnPoint);
+            T obj = _create();
             Spawned.Invoke(obj);
         }
     }

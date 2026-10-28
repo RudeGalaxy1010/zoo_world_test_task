@@ -1,3 +1,4 @@
+using System;
 using App.Domains.Entity.Api;
 using App.Domains.Entity.Impl;
 using App.Domains.Resource.Impl;
@@ -16,7 +17,7 @@ namespace App.Installers
         public override void InstallBindings()
         {
             Container
-                .BindIFactory<Animal, Transform, ISpawner<Animal>>()
+                .BindIFactory<Func<Animal>, ISpawner<Animal>>()
                 .To<Spawner<Animal>>()
                 .AsSingle();
 

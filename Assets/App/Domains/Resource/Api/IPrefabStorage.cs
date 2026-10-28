@@ -1,7 +1,11 @@
-﻿namespace App.Domains.Resource.Api
+﻿using App.Domains.Entity.Impl;
+
+namespace App.Domains.Resource.Api
 {
     public interface IPrefabStorage
     {
-        bool TryGet<T>(out T? prefab);
+        Level Level { get; }
+        Animal Frog { get; }
+        Animal Snake { get; }
     }
 }

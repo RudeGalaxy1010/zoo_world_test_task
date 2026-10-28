@@ -14,7 +14,7 @@ namespace App
         private const float SpawnPeriod = 2f;
         private const float PredatorSpawnChance = 0.5f;
 
-        private readonly IFactory<Animal, Transform, ISpawner<Animal>> _spawnerFactory;
+        private readonly IFactory<Func<Animal>, ISpawner<Animal>> _spawnerFactory;
         private readonly IMoveService _moveService;
         private readonly IPrefabStorage _prefabStorage;
         private readonly IColorStorage _colorStorage;
@@ -25,7 +25,7 @@ namespace App
         private Level? _level;
 
         public BootService(
-            IFactory<Animal, Transform, ISpawner<Animal>> spawnerFactory,
+            IFactory<Func<Animal>, ISpawner<Animal>> spawnerFactory,
             IMoveService moveService,
             IPrefabStorage prefabStorage,
             IColorStorage colorStorage,
@@ -42,8 +42,15 @@ namespace App
 
         public void Initialize()
         {
-            _level = CreateLevel();
-            _animalSpawner = CreateAnimalSpawner(_level!.SpawnPoint);
+            if (_prefabStorage.Level == null || _prefabStorage.Frog == null || _prefabStorage.Snake == null)
+            {
+                throw new InvalidOperationException($"{nameof(BootService)}: Level, Frog and Snake prefabs must be assigned");
+            }
+
+            _level = Object.Instantiate(_prefabStorage.Level, _root);
+            _animalSpawner = _spawnerFactory.Create(CreateAnimal);
+            _animalSpawner.Spawned += OnAnimalSpawned;
+            _animalSpawner.Start(SpawnPeriod);
         }
 
         public void Dispose()
@@ -55,26 +62,12 @@ namespace App
             }
         }
 
-        private ISpawner<Animal> CreateAnimalSpawner(Transform spawnPoint)
+        private Animal CreateAnimal()
         {
-            if (_prefabStorage.TryGet(out Animal? animal))
-            {
-                ISpawner<Animal> animalSpawner = _spawnerFactory.Create(animal!, spawnPoint);
-                animalSpawner.Start(SpawnPeriod);
-                animalSpawner.Spawned += OnAnimalSpawned;
-                return animalSpawner;
-            }
-
-            throw new InvalidOperationException($"{nameof(BootService)}: Animal not found");
-        }
-
-        private Level? CreateLevel() => _prefabStorage.TryGet(out Level? level)
-            ? Object.Instantiate(level, _root)
-            : throw new InvalidOperationException($"{nameof(BootService)}: Level not found");
-
-        private void OnAnimalSpawned(Animal animal)
-        {
-            if (Random.value < PredatorSpawnChance)
+            bool isPredator = Random.value < PredatorSpawnChance;
+            Animal prefab = isPredator ? _prefabStorage.Snake : _prefabStorage.Frog;
+            Animal animal = Object.Instantiate(prefab, _level!.SpawnPoint);
+            if (isPredator)
             {
                 SetupPredator(animal);
             }
@@ -83,8 +76,11 @@ namespace App
                 SetupPrey(animal);
             }
 
-            _moveService.Register(animal);
+            return animal;
         }
+
+        private void OnAnimalSpawned(Animal animal) =>
+            _moveService.Register(animal);
 
         private void SetupPrey(Animal animal)
         {
